@@ -1,0 +1,108 @@
+---
+title: "Teste de Hipóteses (Qui-quadrado) PDC 2013"
+author: "Felipe Augusto Oliveira Rezende"
+date: "2024-07-17"
+output: html_document
+---
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.width = 7,
+  fig.height = 5,
+  fig.retina = 1,
+  warning = FALSE,
+  message = FALSE,
+  size = 'tiny'
+)
+```
+
+```{r, echo=FALSE, include=FALSE}
+library(xlsx)
+library(readxl)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(rmarkdown)
+library(xaringan)
+
+read_excel("C:/Users/Felipe/Desktop/Doutorado IRel UnB/Fontes e Materiais de Pesquisa Empírica Doutorado/Base de Dados PDC 2013_MetQuanti_FelipeAugustoOliveiraRezende.xlsx")
+PDC_2013 <- read_excel("C:/Users/Felipe/Desktop/Doutorado IRel UnB/Fontes e Materiais de Pesquisa Empírica Doutorado/Base de Dados PDC 2013_MetQuanti_FelipeAugustoOliveiraRezende.xlsx")
+
+```
+
+## Teste de Hipótese (Qui-quadrado)
+
+```{r}
+
+PDC_2013_genero <- PDC_2013 %>% filter(`Paridade Gênero` == 1)
+PDC_2013_raça <- PDC_2013 %>% filter(`Paridade Raça` == 1)
+PDC_2013_gen_raça <- PDC_2013 %>% filter(`Paridade Gênero` == 1 & `Paridade Raça` == 1)
+
+n_total <- nrow(PDC_2013)
+```
+
+## Contagens de cada categoria
+
+```{r}
+n_genero <- nrow(PDC_2013_genero)
+n_raça <- nrow(PDC_2013_raça)
+n_gen_raça <- nrow(PDC_2013_gen_raça)
+```
+
+## Tabela de contigência
+
+```{r}
+contingency_table <- matrix(c(n_genero, n_total - n_genero,
+                              n_raça, n_total - n_raça,
+                              n_gen_raça, n_total - n_gen_raça),
+                            nrow = 3, byrow = TRUE)
+
+rownames(contingency_table) <- c("Paridade Gênero", "Paridade Raça", "Paridade Gênero e Raça")
+colnames(contingency_table) <- c("Sim", "Não")
+
+knitr::kable(contingency_table, caption = "Tabela de Contingência")
+```
+
+## Teste qui-quadrado
+
+```{r}
+chi_squared_test <- chisq.test(contingency_table)
+
+##Resultados
+chi_squared_test
+
+#Exibindo os valores esperados e os resíduos padronizados
+chi_squared_test$expected
+chi_squared_test$residuals
+```
+## Justificativa pela escolha do Teste de Hipótese (Qui-quadrado)
+
+Considerando as seguintes hipóteses consiguradas na Lista 4:
+
+*Hipótese Nula (H0): não há diferença significativa entre as proporções de paridade de gênero, paridade de raça e paridade de gênero e raça.*
+
+*Hipótese Alternativa (H1): há pelo menos uma diferença significativa entre as proporções de paridade de gênero, paridade de raça e paridade de gênero e raça.*
+
+Assumimos o Teste de Qui-quadrado como testagem de hipótese empregada pelo modelo.
+
+O Teste de Qui-quadrado é um método estatístico válido para verificar a existência de diferença significativa entre variáveis, a partir da correlação entre as frequências observadas e as frequências esperadas em uma ou mais categorias.
+
+O Teste de Qui-quadrado se coloca como teste de hipótese amplamente utilizado, porque pertinente para a comparação de proporções baseadas em dados categóricos. 
+
+A escolha do Teste Qui-quadrado para avaliar as proporções de paridade de gênero, paridade de raça e paridade de gênero & raça nas ações/eventos PDC 2013 se justifica pelas próprias características e natureza dos dados.
+
+## Interpretação dos resultados gerados pelo Teste de Qui-quadrado em face das Hipóteses Configuradas
+
+O p-valor = 3.564e-06 (0.000003564) é muito menor que o nível de significância adotado de 0.05. Dado que o p-valor é significativamente menor que 0.05, rejeitamos a hipótese nula (H0) de que *não há diferença significativa entre as proporções de paridade de gênero, paridade de raça e paridade de gênero e raça.*
+
+Portanto, ao notar que *há uma diferença significativa entre as proporções de paridade de gênero, paridade de raça e paridade de gênero e raça* nos eventos PDC 2013, além de indicar a independência entre cada uma das variáveis em tela, corroboramos a hipótese alternativa de que *há pelo menos uma diferença significativa entre as proporções de paridade de gênero, paridade de raça e paridade de gênero e raça.*
+
+## Conclusão
+
+Conforme se demonstra, existem diferenças significativas nas proporções de paridade de gênero, paridade de raça e paridade de gênero e raça nos eventos culturais PDC 2013.
+
+A paridade de gênero tem um resíduo padronizado positivo significativo para a categoria "Sim", indicando que há mais eventos com paridade de gênero do que o esperado.
+
+A paridade de gênero e raça tem um resíduo padronizado negativo significativo para a categoria "Sim", indicando que há menos eventos com paridade de gênero e raça do que o esperado.
